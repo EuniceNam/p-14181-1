@@ -47,7 +47,7 @@ public class ApiV1PostCommentController {
 
     @GetMapping("/{id}/delete")
     @Transactional
-    public RsData<PostCommentDto> delete(
+    public RsData<Void> delete(
             @PathVariable int postId,
             @PathVariable int id
     ) {
@@ -58,8 +58,7 @@ public class ApiV1PostCommentController {
 
         return new RsData<>(
                 "200-1",
-                "%d번 댓글이 삭제되었습니다.".formatted(postComment.getId()),
-                new PostCommentDto(postComment)
+                "%d번 댓글이 삭제되었습니다.".formatted(postComment.getId())
         );
     }
 }
