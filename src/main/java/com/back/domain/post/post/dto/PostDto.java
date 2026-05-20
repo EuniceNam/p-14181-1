@@ -1,9 +1,11 @@
 package com.back.domain.post.post.dto;
 
 import com.back.domain.post.post.entity.Post;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class PostDto {
     private final int id;
     private final LocalDateTime createdDate;
