@@ -40,4 +40,17 @@ public class ApiV1PostCommentController {
 
         return new PostCommentDto(postComment);
     }
+
+    @GetMapping("/{id}/delete")
+    public String delete(
+            @PathVariable int postId,
+            @PathVariable int id
+    ) {
+        Post post = postService.findById(postId).get();
+        PostComment postComment = post.findCommentById(id).get();
+
+        postService.deleteComment(post, postComment);
+
+        return "%d번 댓글이 삭제되었습니다.".formatted(id);
+    }
 }
