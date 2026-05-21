@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -25,7 +26,7 @@ public class ApiV1PostControllerTest {
     @Test
     @DisplayName("글 작성")
     void t1() throws Exception {
-        mvc
+        ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -36,7 +37,9 @@ public class ApiV1PostControllerTest {
                                         }
                                         """)
                 )
-                .andDo(print())
-                .andExpect(status().isCreated()); // 201 Created 상태코드 검증
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isCreated());
     }
 }
