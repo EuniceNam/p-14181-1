@@ -30,6 +30,7 @@ public class ApiV1PostControllerTest {
     @Autowired
     private PostService postService;
 
+
     @Test
     @DisplayName("글 작성")
     void t1() throws Exception {
@@ -60,6 +61,34 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.data.title").value("제목"))
                 .andExpect(jsonPath("$.data.content").value("내용"));
     }
+
+    @Test
+    @DisplayName("글 작성, without title")
+    void t7() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/posts")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                            "title": "",
+                                            "content": "내용"
+                                        }
+                                        """)
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("write"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("400-1"))
+                .andExpect(jsonPath("$.msg").value("""
+                        title-NotBlank-must not be blank
+                        title-Size-size must be between 2 and 100
+                        """.stripIndent().trim()));
+    }
+
 
     @Test
     @DisplayName("글 수정")
