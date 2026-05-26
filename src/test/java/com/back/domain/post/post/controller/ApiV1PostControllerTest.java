@@ -46,7 +46,6 @@ public class ApiV1PostControllerTest {
                 .andDo(print());
 
         Post post = postService.findLatest().get();
-        long totalCount = postService.count();
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1PostController.class))
