@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.InetAddress;
 
 import static java.net.InetAddress.getLocalHost;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 
 @RestController
 public class HomeController {
     @SneakyThrows
-    @GetMapping
+    @GetMapping(produces = TEXT_HTML_VALUE)
     public String main() {
         InetAddress localHost = getLocalHost();
 
