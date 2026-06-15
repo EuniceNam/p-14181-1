@@ -4,10 +4,15 @@ package com.back.domain.member.member.controller;
 import com.back.domain.member.member.dto.MemberDto;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
@@ -19,10 +24,37 @@ import org.springframework.web.client.RestClient;
 public class ApiV1MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/join")
-    public RsData<MemberDto> join(Member member) {
-        Member res = memberService.join(member.getUsername(), member.getPassword(), member.getNickname());
+    record MemberJoinReqBody(
+            @NotBlank
+            @Size(min = 2, max = 30)
+            String username,
+            @NotBlank
+            @Size(min = 2, max = 30)
+            String password,
+            @NotBlank
+            @Size(min = 2, max = 30)
+            String nickname
+    ) {
+    }
 
-        return new RsData<MemberDto>("201-1", "%s님 환영합니다. 회원가입이 완료되었습니다.".formatted(res.getName()), new MemberDto(res));
+    @PostMapping("/join")
+    public RsData<MemberDto> join(
+            @Valid @RequestBody MemberJoinReqBody reqBody
+    ) {
+        memberService.findByUsername(reqBody.username)
+                .ifPresent(member -> {
+                            throw new ServiceException("409-1", "이미 존재하는 아이디입니다.");
+                        });
+        Member member = memberService.join(
+                reqBody.username(),
+                reqBody.password(),
+                reqBody.nickname()
+        );
+
+        return new RsData<MemberDto>(
+                "201-1",
+                "%s님 환영합니다. 회원가입이 완료되었습니다.".formatted(member.getName()),
+                new MemberDto(member)
+        );
     }
 }
