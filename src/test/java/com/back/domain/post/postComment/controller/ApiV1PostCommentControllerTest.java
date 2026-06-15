@@ -102,7 +102,9 @@ public class ApiV1PostCommentControllerTest {
     void t3() throws Exception {
         int postId = 1;
         int id = 1;
-        Member actor = memberService.findByUsername("user1").get();
+        Post post = postService.findById(postId).get();
+        PostComment postComment = post.findCommentById(id).get();
+        Member actor = postComment.getAuthor();
         String actorApiKey = actor.getApiKey();
 
         ResultActions resultActions = mvc
@@ -125,7 +127,9 @@ public class ApiV1PostCommentControllerTest {
     void t4() throws Exception {
         int postId = 1;
         int id = 1;
-        Member actor = memberService.findByUsername("user1").get();
+        Post post = postService.findById(postId).get();
+        PostComment postComment = post.findCommentById(id).get();
+        Member actor = postComment.getAuthor();
         String actorApiKey = actor.getApiKey();
 
         ResultActions resultActions = mvc
