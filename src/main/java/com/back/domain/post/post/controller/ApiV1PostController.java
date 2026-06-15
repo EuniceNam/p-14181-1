@@ -54,8 +54,15 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     @Transactional
     @Operation(summary = "삭제")
-    public RsData<Void> delete(@PathVariable int id) {
+    public RsData<Void> delete(
+            @PathVariable int id,
+            @RequestHeader("Authorization") String authorization
+    ) {
+        String apiKey = authorization.replace("Bearer ", "");
         Post post = postService.findById(id).get();
+        if (!post.getAuthor().getApiKey().equals(apiKey)) {
+            throw new ServiceException("403-1", "글 삭제 권한이 없습니다.");
+        }
 
         postService.delete(post);
 
