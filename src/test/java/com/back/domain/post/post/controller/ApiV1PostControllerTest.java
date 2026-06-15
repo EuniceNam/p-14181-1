@@ -1,5 +1,7 @@
 package com.back.domain.post.post.controller;
 
+import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.service.MemberService;
 import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import org.hamcrest.Matchers;
@@ -29,14 +31,17 @@ public class ApiV1PostControllerTest {
     private MockMvc mvc;
     @Autowired
     private PostService postService;
-
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("글 작성")
     void t1() throws Exception {
+        Member actor = memberService.findByUsername("user1").get();
+        String actorApiKey = actor.getApiKey();
         ResultActions resultActions = mvc
                 .perform(
-                        post("/api/v1/posts")
+                        post("/api/v1/posts?apiKey=" + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
