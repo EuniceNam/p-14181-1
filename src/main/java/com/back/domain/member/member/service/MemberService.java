@@ -27,6 +27,11 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    public Member login(String username, String password) {
+        return memberRepository.findByUsernameAndPassword(username, password)
+                .orElseThrow(() -> new ServiceException("401-1", "아이디 또는 비밀번호가 일치하지 않습니다."));
+    }
+
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
     }

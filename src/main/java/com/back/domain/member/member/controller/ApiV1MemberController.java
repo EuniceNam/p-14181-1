@@ -51,4 +51,36 @@ public class ApiV1MemberController {
                 new MemberDto(member)
         );
     }
+
+    record MemberLoginReqBody(
+            @NotBlank
+            @Size(min = 2, max = 30)
+            String username,
+            @NotBlank
+            @Size(min = 2, max = 30)
+            String password
+    ) {
+    }
+
+    record MemberLoginResBody(
+            String apiKey,
+            MemberDto item
+    ) {
+    }
+
+    @PostMapping("/login")
+    public RsData<MemberLoginResBody> login(
+            @Valid @RequestBody MemberLoginReqBody reqBody
+    ) {
+        Member member = memberService.login(
+                reqBody.username(),
+                reqBody.password()
+        );
+
+        return new RsData<>(
+                "200-1",
+                "%s님 환영합니다.".formatted(member.getName()),
+                new MemberLoginResBody(member.getApiKey(), new MemberDto(member))
+        );
+    }
 }
