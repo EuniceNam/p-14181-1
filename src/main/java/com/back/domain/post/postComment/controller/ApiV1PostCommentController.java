@@ -62,7 +62,7 @@ public class ApiV1PostCommentController {
     public RsData<Void> delete(
             @PathVariable int postId,
             @PathVariable int id,
-            @RequestHeader String authorization
+            @NotBlank @Size(min = 30, max = 50) @RequestHeader String authorization
     ) {
         String apiKey = authorization.replace("Bearer ", "");
         Member actor = memberService.findByApiKey(apiKey)
@@ -96,7 +96,7 @@ public class ApiV1PostCommentController {
     public RsData<Void> modify(
             @PathVariable int postId,
             @PathVariable int id,
-            @RequestHeader String authorization,
+            @NotBlank @Size(min = 30, max = 50) @RequestHeader String authorization,
             @RequestBody @Valid PostCommentModifyReqBody reqBody
     ) {
         String apiKey = authorization.replace("Bearer ", "");
@@ -130,7 +130,7 @@ public class ApiV1PostCommentController {
     @Operation(summary = "작성")
     public RsData<PostCommentDto> write(
             @PathVariable int postId,
-            @RequestHeader("Authorization") String authorization,
+            @NotBlank @Size(min = 30, max = 50) @RequestHeader("Authorization") String authorization,
             @Valid @RequestBody PostCommentWriteReqBody reqBody
     ) {
         String apiKey = authorization.replace("Bearer ", "");
