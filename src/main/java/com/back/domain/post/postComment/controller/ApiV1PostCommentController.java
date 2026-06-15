@@ -6,6 +6,7 @@ import com.back.domain.post.post.entity.Post;
 import com.back.domain.post.post.service.PostService;
 import com.back.domain.post.postComment.dto.PostCommentDto;
 import com.back.domain.post.postComment.entity.PostComment;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,11 +15,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @RequiredArgsConstructor
 @Tag(name = "ApiV1PostCommentController", description = "API 댓글 컨트롤러")
@@ -58,10 +61,18 @@ public class ApiV1PostCommentController {
     @Operation(summary = "삭제")
     public RsData<Void> delete(
             @PathVariable int postId,
-            @PathVariable int id
+            @PathVariable int id,
+            @RequestHeader String authorization
     ) {
+        String apiKey = authorization.replace("Bearer ", "");
+        Member actor = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 apiKey 입니다."));
+
         Post post = postService.findById(postId).get();
         PostComment postComment = post.findCommentById(id).get();
+        if (!postComment.getAuthor().equals(actor)) {
+            throw new ServiceException("403-1", "댓글의 작성자만 삭제할 수 있습니다.");
+        }
 
         postService.deleteComment(post, postComment);
 
@@ -85,10 +96,18 @@ public class ApiV1PostCommentController {
     public RsData<Void> modify(
             @PathVariable int postId,
             @PathVariable int id,
+            @RequestHeader String authorization,
             @RequestBody @Valid PostCommentModifyReqBody reqBody
     ) {
+        String apiKey = authorization.replace("Bearer ", "");
+        Member actor = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 apiKey 입니다."));
+
         Post post = postService.findById(postId).get();
         PostComment postComment = post.findCommentById(id).get();
+        if (!postComment.getAuthor().equals(actor)) {
+            throw new ServiceException("403-1", "댓글의 작성자만 수정할 수 있습니다.");
+        }
 
         postService.modifyComment(postComment, reqBody.content);
 
@@ -111,9 +130,13 @@ public class ApiV1PostCommentController {
     @Operation(summary = "작성")
     public RsData<PostCommentDto> write(
             @PathVariable int postId,
+            @RequestHeader("Authorization") String authorization,
             @Valid @RequestBody PostCommentWriteReqBody reqBody
     ) {
-        Member actor = memberService.findByUsername("user1").get(); // 임시로 작성자를 user1로 지정
+        String apiKey = authorization.replace("Bearer ", "");
+        Member actor = memberService.findByApiKey(apiKey)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 apiKey 입니다."));
+
         Post post = postService.findById(postId).get();
 
         PostComment postComment = postService.writeComment(actor, post, reqBody.content);
