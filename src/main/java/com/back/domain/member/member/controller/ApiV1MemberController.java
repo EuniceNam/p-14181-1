@@ -37,7 +37,7 @@ public class ApiV1MemberController {
     ) {
     }
 
-    @PostMapping("/join")
+    @PostMapping
     public RsData<MemberDto> join(
             @Valid @RequestBody MemberJoinReqBody reqBody
     ) {
