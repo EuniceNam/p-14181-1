@@ -33,7 +33,7 @@ public class PostComment extends BaseEntity {
 
     public void checkActorCanModify(Member actor) {
         if (!author.equals(actor))
-            throw new ServiceException("403-1", "댓글의 작성자만 수정할 수 있습니다.");
+            throw new ServiceException("403-1", "%d번 댓글 수정권한이 없습니다.".formatted(getId()));
     }
 
     public void checkActorCanDelete(Member actor) {
