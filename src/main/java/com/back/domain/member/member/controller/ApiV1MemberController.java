@@ -7,6 +7,7 @@ import com.back.domain.member.member.service.MemberService;
 import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -75,6 +76,7 @@ public class ApiV1MemberController {
                 reqBody.username(),
                 reqBody.password()
         );
+        rq.setCookie("apiKey", member.getApiKey());
 
         return new RsData<>(
                 "200-1",
