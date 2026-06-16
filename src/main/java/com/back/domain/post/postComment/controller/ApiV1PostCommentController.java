@@ -69,10 +69,7 @@ public class ApiV1PostCommentController {
 
         Post post = postService.findById(postId).get();
         PostComment postComment = post.findCommentById(id).get();
-        if (!postComment.getAuthor().equals(actor)) {
-            throw new ServiceException("403-1", "댓글의 작성자만 삭제할 수 있습니다.");
-        }
-
+        postComment.checkActorCanDelete(actor);
         postService.deleteComment(post, postComment);
 
         return new RsData<>(
@@ -101,9 +98,7 @@ public class ApiV1PostCommentController {
 
         Post post = postService.findById(postId).get();
         PostComment postComment = post.findCommentById(id).get();
-        if (!postComment.getAuthor().equals(actor)) {
-            throw new ServiceException("403-1", "댓글의 작성자만 수정할 수 있습니다.");
-        }
+        postComment.checkActorCanModify(actor);
 
         postService.modifyComment(postComment, reqBody.content);
 
