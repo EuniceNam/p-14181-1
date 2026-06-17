@@ -5,8 +5,10 @@ import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Ut {
@@ -33,6 +35,37 @@ public class Ut {
                     .compact();
 
             return jwt;
+        }
+
+        public static boolean isValid(String secret, String jwtStr) {
+            SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+
+            try {
+                Jwts.parser()
+                        .verifyWith(secretKey)
+                        .build()
+                        .parseSignedClaims(jwtStr);
+            } catch (Exception e) {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static Map<String, Object> payload(String secret, String jwtStr) {
+            SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+
+            try {
+                return new LinkedHashMap<>(
+                        Jwts.parser()
+                                .verifyWith(secretKey)
+                                .build()
+                                .parseSignedClaims(jwtStr)
+                                .getPayload()
+                );
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 }
