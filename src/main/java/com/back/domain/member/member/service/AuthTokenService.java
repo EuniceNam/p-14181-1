@@ -3,14 +3,19 @@ package com.back.domain.member.member.service;
 
 import com.back.domain.member.member.entity.Member;
 import com.back.standard.util.Ut;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
 public class AuthTokenService {
-    private final int expireSeconds = 60 * 60 * 24 * 365;
-    private final String secret = "abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890";
+    @Value("${custom.accessToken.expirationSeconds}")
+    private int expireSeconds;
+
+    @Value("${custom.jwt.secretKey}")
+    private String secret;
+
     public String genAccessToken(Member member) {
         long id = member.getId();
         String username = member.getUsername();
