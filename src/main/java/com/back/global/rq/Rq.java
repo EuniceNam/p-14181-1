@@ -69,4 +69,13 @@ public class Rq {
 
         resp.addCookie(cookie);
     }
+
+    public void removeCookie(String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+
+        resp.addCookie(cookie);
+    }
 }
