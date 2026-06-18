@@ -15,12 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -124,7 +120,8 @@ public class AuthTokenServiceTest {
                 .containsAllEntriesOf(
                         Map.of(
                                 "id", memberUser1.getId(),
-                                "username", memberUser1.getUsername()
+                                "username", memberUser1.getUsername(),
+                                "name", memberUser1.getName()
                         )
                 );
     }

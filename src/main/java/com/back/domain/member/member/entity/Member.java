@@ -19,9 +19,10 @@ public class Member extends BaseEntity {
     @Column(unique = true)
     private String apiKey;
 
-    public Member(int id, String username) {
+    public Member(int id, String username, String name) {
         setId(id);
         this.username = username;
+        setName(name);
     }
 
     public Member(String username, String password, String nickname) {
@@ -30,6 +31,11 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         this.apiKey = UUID.randomUUID().toString();
     }
+
+    public void setName(String name) {
+        this.nickname = name;
+    }
+
     public String getName() {
         return nickname;
     }
