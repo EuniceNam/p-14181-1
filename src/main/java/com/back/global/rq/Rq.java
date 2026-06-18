@@ -48,8 +48,9 @@ public class Rq {
 
             if (payload != null) {
                 int id = (int) payload.get("id");
-                member = memberService.findById(id) // 임시코드, 추후 DB 조회 없이 회원객체 생성할 예정
-                        .orElse(null);
+                String username = (String) payload.get("username");
+
+                member = new Member(id, username);
             }
         }
 
