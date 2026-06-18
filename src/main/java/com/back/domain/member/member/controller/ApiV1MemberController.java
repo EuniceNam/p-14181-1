@@ -2,6 +2,7 @@ package com.back.domain.member.member.controller;
 
 
 import com.back.domain.member.member.dto.MemberDto;
+import com.back.domain.member.member.dto.MemberWithUsernameDto;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
 import com.back.global.rq.Rq;
@@ -92,14 +93,10 @@ public class ApiV1MemberController {
     }
 
     @GetMapping("/me")
-    public RsData<MemberDto> me() {
-        Member member = memberService.findById(rq.getActor().getId()).get();
+    public MemberWithUsernameDto me() {
+        Member actor = memberService.findById(rq.getActor().getId()).get();
 
-        return new RsData<>(
-                "200-1",
-                "%s님의 정보입니다.".formatted(member.getName()),
-                new MemberDto(member)
-        );
+        return new MemberWithUsernameDto(actor);
     }
 
     @DeleteMapping("/logout")
