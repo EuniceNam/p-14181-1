@@ -29,7 +29,6 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class ApiV1PostController {
     private final PostService postService;
-    private final MemberService memberService;
     private final Rq rq;
 
     @GetMapping
@@ -89,7 +88,7 @@ public class ApiV1PostController {
     public RsData<PostDto> write(
             @Valid @RequestBody PostWriteReqBody reqBody
     ) {
-        Member actor = memberService.findById(rq.getActor().getId()).get();
+        Member actor = rq.getActor();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
