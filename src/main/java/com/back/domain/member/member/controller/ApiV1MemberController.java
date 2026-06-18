@@ -65,6 +65,7 @@ public class ApiV1MemberController {
 
     record MemberLoginResBody(
             String apiKey,
+            String accessToken,
             MemberDto item
     ) {
     }
@@ -77,12 +78,16 @@ public class ApiV1MemberController {
                 reqBody.username(),
                 reqBody.password()
         );
+
+        String accessToken = memberService.genAccessToken(member);
+
         rq.setCookie("apiKey", member.getApiKey());
+        rq.setCookie("accessToken", accessToken);
 
         return new RsData<>(
                 "200-1",
                 "%s님 환영합니다.".formatted(member.getName()),
-                new MemberLoginResBody(member.getApiKey(), new MemberDto(member))
+                new MemberLoginResBody(member.getApiKey(), accessToken, new MemberDto(member))
         );
     }
 
@@ -100,6 +105,7 @@ public class ApiV1MemberController {
     @DeleteMapping("/logout")
     public RsData<Void> logout() {
         rq.removeCookie("apiKey");
+        rq.removeCookie("accessToken");
 
         return new RsData<>(
                 "200-1",

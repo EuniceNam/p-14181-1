@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -20,23 +21,43 @@ public class Rq {
     private final HttpServletResponse resp;
 
     public Member getActor() {
-        String headerAuthorization = getHeader("Authorization", "");
         String apiKey;
+        String accessToken;
+
+        String headerAuthorization = getHeader("Authorization", "");
 
         if (!headerAuthorization.isBlank()) {
             if (!headerAuthorization.startsWith("Bearer ")) {
                 throw new ServiceException("401-2", "Authorization 헤더가 Bearer 형식이 아닙니다.");
             }
-            apiKey = headerAuthorization.substring("Bearer ".length()).trim();
+            String[] headerAuthorizationBits = headerAuthorization.split(" ", 3);
+
+            apiKey = headerAuthorizationBits[1];
+            accessToken = headerAuthorizationBits.length == 3 ? headerAuthorizationBits[2] : "";
         } else {
             apiKey = getCookieValue("apiKey", "");
+            accessToken = getCookieValue("accessToken", "");
         }
 
         if (apiKey.isBlank()) {throw new ServiceException("401-1", "로그인 후 이용해주세요.");}
 
-        Member member = memberService
-                .findByApiKey(apiKey)
-                .orElseThrow(() -> new ServiceException("401-3", "API 키가 유효하지 않습니다."));
+        Member member = null;
+
+        if (!accessToken.isBlank()) {
+            Map<String, Object> payload = memberService.payload(accessToken);
+
+            if (payload != null) {
+                int id = (int) payload.get("id");
+                member = memberService.findById(id) // 임시코드, 추후 DB 조회 없이 회원객체 생성할 예정
+                        .orElse(null);
+            }
+        }
+
+        if (member == null) {
+            member = memberService
+                    .findByApiKey(apiKey)
+                    .orElseThrow(() -> new ServiceException("401-3", "API 키가 유효하지 않습니다."));
+        }
 
         return member;
     }
