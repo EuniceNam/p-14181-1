@@ -119,15 +119,11 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             rq.setHeader("Authorization", actorAccessToken);
         }
 
-        Collection<? extends GrantedAuthority> authorities = member.isAdmin() ?
-                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) : List.of();
-
         UserDetails user = new SecurityUser(
                 member.getId(),
                 member.getUsername(),
-                "",
                 member.getName(),
-                authorities
+                member.getAuthorities()
         );
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
