@@ -16,6 +16,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.blankOrNullString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -190,5 +192,51 @@ public class ApiV1MemberControllerTest {
                     assertThat(accessTokenCookie.getPath()).isEqualTo("/");
                     assertThat(accessTokenCookie.isHttpOnly()).isTrue();
                 });
+    }
+
+    @Test
+    @DisplayName("엑세스 토큰이 만료되었거나 유효하지 않다면 apiKey를 통해서 재발급")
+    void t7() throws Exception {
+        Member actor = memberService.findByUsername("user1").get();
+        String actorApiKey = actor.getApiKey();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/members/me")
+                                .header("Authorization", "Bearer " + actorApiKey + " wrong-access-token")
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().methodName("me"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Authorization", not(blankOrNullString())))
+                .andExpect(
+                        result -> {
+                            Cookie accessTokenCookie = result.getResponse().getCookie("accessToken");
+
+                            assertThat(accessTokenCookie).isNotNull();
+                            assertThat(accessTokenCookie.getValue()).isNotBlank();
+                            assertThat(accessTokenCookie.getPath()).isEqualTo("/");
+                            assertThat(accessTokenCookie.isHttpOnly()).isTrue();
+                        }
+                );
+    }
+
+    @Test
+    @DisplayName("Authorization 헤더가 Bearer 형식이 아닐 때 오류")
+    void t8() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/members/me")
+                                .header("Authorization", "key")
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-2"))
+                .andExpect(jsonPath("$.msg").value("Authorization 헤더가 Bearer 형식이 아닙니다."));
     }
 }
