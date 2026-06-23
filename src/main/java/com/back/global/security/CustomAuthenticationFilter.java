@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -122,6 +121,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             rq.setCookie("accessToken", actorAccessToken);
             rq.setHeader("Authorization", actorAccessToken);
         }
+        rq.setActor(member);
 
         Collection<? extends GrantedAuthority> authorities = member.isAdmin() ?
                 List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) : List.of();
