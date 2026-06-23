@@ -1,5 +1,7 @@
 package com.back.global.security;
 
+import com.back.global.rsData.RsData;
+import com.back.standard.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,12 +59,12 @@ public class SecurityConfig {
 
                                             response.setStatus(401);
                                             response.getWriter().write(
-                                                    """
-                                                            {
-                                                                 "resultCode": "401-1",
-                                                                 "msg": "로그인 후 이용해주세요."
-                                                            }
-                                                            """
+                                                    Ut.json.toString(
+                                                            new RsData<Void>(
+                                                                    "401-1",
+                                                                    "로그인 후 이용해주세요."
+                                                            )
+                                                    )
                                             );
                                         }
                                 )
@@ -72,12 +74,12 @@ public class SecurityConfig {
 
                                             response.setStatus(403);
                                             response.getWriter().write(
-                                                    """
-                                                            {
-                                                                 "resultCode": "403-1",
-                                                                 "msg": "권한이 없습니다."
-                                                            }
-                                                            """
+                                                    Ut.json.toString(
+                                                            new RsData<Void>(
+                                                                    "403-1",
+                                                                    "권한이 없습니다."
+                                                            )
+                                                    )
                                             );
                                         }
                                 )
