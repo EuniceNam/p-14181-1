@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -37,13 +38,11 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성")
+    @WithUserDetails("user1")
     void t1() throws Exception {
-        Member actor = memberService.findByUsername("user1").get();
-        String actorApiKey = actor.getApiKey();
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -73,17 +72,12 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 수정")
+    @WithUserDetails("user1")
     void t2() throws Exception {
         int id = 1;
-        Post post = postService.findById(id).get();
-        Member actor = post.getAuthor();
-        String actorApiKey = actor.getApiKey();
-
-
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/" + id)
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -104,16 +98,12 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 삭제")
+    @WithUserDetails("user1")
     void t3() throws Exception {
         int id = 1;
-        Post post = postService.findById(id).get();
-        Member actor = post.getAuthor();
-        String actorApiKey = actor.getApiKey();
-
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/" + id)
-                                .header("Authorization", "Bearer " + actorApiKey)
                 )
                 .andDo(print());
 
@@ -202,14 +192,11 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성, without title")
+    @WithUserDetails("user1")
     void t7() throws Exception {
-        Member actor = memberService.findByUsername("user1").get();
-        String actorApiKey = actor.getApiKey();
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -233,14 +220,11 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성, without content")
+    @WithUserDetails("user1")
     void t8() throws Exception {
-        Member actor = memberService.findByUsername("user1").get();
-        String actorApiKey = actor.getApiKey();
-
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -264,10 +248,8 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성, with wrong json syntax")
+    @WithUserDetails("user1")
     void t9() throws Exception {
-        Member actor = memberService.findByUsername("user1").get();
-        String actorApiKey = actor.getApiKey();
-
         String wrongJsonBody = """
                 {
                     "title": 제목",
@@ -277,7 +259,6 @@ public class ApiV1PostControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(wrongJsonBody)
                 )
@@ -338,16 +319,13 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 수정, without permission")
+    @WithUserDetails("user3")
     void t12() throws Exception {
         int id = 1;
-
-        Member actor = memberService.findByUsername("user3").get();
-        String actorApiKey = actor.getApiKey();
 
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/" + id)
-                                .header("Authorization", "Bearer " + actorApiKey)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
@@ -368,16 +346,13 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 삭제, without permission")
+    @WithUserDetails("user3")
     void t13() throws Exception {
         int id = 1;
-
-        Member actor = memberService.findByUsername("user3").get();
-        String actorApiKey = actor.getApiKey();
 
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/" + id)
-                                .header("Authorization", "Bearer " + actorApiKey)
                 )
                 .andDo(print());
 
