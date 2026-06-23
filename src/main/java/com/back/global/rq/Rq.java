@@ -5,13 +5,10 @@ import com.back.global.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -71,10 +68,12 @@ public class Rq {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setDomain("localhost");
+        cookie.setSecure(true);
+        cookie.setAttribute("SameSite", "Strict");
 
-        if (value.isBlank()) {
-            cookie.setMaxAge(0);
-        }
+        if (value.isBlank()) cookie.setMaxAge(0);
+        else cookie.setMaxAge(60 * 60 * 24 * 365);
 
         resp.addCookie(cookie);
     }
